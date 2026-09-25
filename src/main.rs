@@ -26,8 +26,8 @@ use sysinfo::System;
 // -----------------------------------------------------------------------
 #[cfg(windows)]
 mod winmem {
-    use windows_sys::Win32::Foundation::NTSTATUS;
     use std::ffi::c_void;
+    use windows_sys::Win32::Foundation::NTSTATUS;
 
     #[link(name = "ntdll")]
     extern "system" {
@@ -63,7 +63,10 @@ mod winmem {
         if status == 0 {
             Ok(())
         } else {
-            Err(format!("NTSTATUS 0x{:08X} (có thể thiếu quyền Administrator)", status as u32))
+            Err(format!(
+                "NTSTATUS 0x{:08X} (có thể thiếu quyền Administrator)",
+                status as u32
+            ))
         }
     }
 }
@@ -115,20 +118,24 @@ impl Mode {
     /// Chú thích tiếng Việt giải thích chế độ này làm gì, hiển thị dưới dropdown.
     fn description_vi(&self) -> &'static str {
         match self {
-            Mode::EmptyWorkingSets =>
+            Mode::EmptyWorkingSets => {
                 "Đẩy bộ nhớ (working set) của tất cả tiến trình đang chạy về \
                  bộ nhớ đệm hệ thống. Không giảm RAM tổng thể ngay lập tức, \
-                 chỉ 'gọn' lại bộ nhớ riêng của từng app.",
-            Mode::FlushModifiedList =>
+                 chỉ 'gọn' lại bộ nhớ riêng của từng app."
+            }
+            Mode::FlushModifiedList => {
                 "Ghi các trang nhớ 'đã sửa nhưng chưa lưu' (modified pages) \
-                 xuống ổ đĩa/pagefile, giúp giải phóng chúng khỏi RAM.",
-            Mode::PurgeStandbyList =>
+                 xuống ổ đĩa/pagefile, giúp giải phóng chúng khỏi RAM."
+            }
+            Mode::PurgeStandbyList => {
                 "Xóa toàn bộ bộ nhớ đệm hệ thống (standby list / cache file). \
                  Đây là phần Windows hiển thị là 'Cached' trong Task Manager. \
-                 Giảm RAM 'used' rõ rệt nhất, nhưng có thể làm app mở lại chậm hơn.",
-            Mode::PurgeLowPriorityStandbyList =>
+                 Giảm RAM 'used' rõ rệt nhất, nhưng có thể làm app mở lại chậm hơn."
+            }
+            Mode::PurgeLowPriorityStandbyList => {
                 "Chỉ xóa phần cache ưu tiên thấp (ít dùng gần đây), giữ lại \
-                 cache quan trọng. Nhẹ nhàng hơn Purge Standby List toàn bộ.",
+                 cache quan trọng. Nhẹ nhàng hơn Purge Standby List toàn bộ."
+            }
         }
     }
 
@@ -149,14 +156,38 @@ struct IntervalOpt {
 }
 
 const INTERVALS: [IntervalOpt; 8] = [
-    IntervalOpt { secs: 5, label: "5 giây" },
-    IntervalOpt { secs: 30, label: "30 giây" },
-    IntervalOpt { secs: 60, label: "1 phút" },
-    IntervalOpt { secs: 120, label: "2 phút" },
-    IntervalOpt { secs: 300, label: "5 phút" },
-    IntervalOpt { secs: 600, label: "10 phút" },
-    IntervalOpt { secs: 900, label: "15 phút" },
-    IntervalOpt { secs: 1800, label: "30 phút" },
+    IntervalOpt {
+        secs: 5,
+        label: "5 giây",
+    },
+    IntervalOpt {
+        secs: 30,
+        label: "30 giây",
+    },
+    IntervalOpt {
+        secs: 60,
+        label: "1 phút",
+    },
+    IntervalOpt {
+        secs: 120,
+        label: "2 phút",
+    },
+    IntervalOpt {
+        secs: 300,
+        label: "5 phút",
+    },
+    IntervalOpt {
+        secs: 600,
+        label: "10 phút",
+    },
+    IntervalOpt {
+        secs: 900,
+        label: "15 phút",
+    },
+    IntervalOpt {
+        secs: 1800,
+        label: "30 phút",
+    },
 ];
 
 // -----------------------------------------------------------------------
@@ -448,6 +479,6 @@ fn main() -> eframe::Result<()> {
     eframe::run_native(
         "Toonie Clean Ram",
         options,
-        Box::new(|_cc| Box::new(CleanRamApp::default())),
+        Box::new(|_cc| Ok(Box::new(CleanRamApp::default()))),
     )
 }
