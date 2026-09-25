@@ -1,0 +1,36 @@
+[package]
+name = "toonie_clean_ram"
+version = "1.0.0"
+edition = "2021"
+authors = ["Toonie (Tú Nguyễn)"]
+description = "Toonie Clean Ram - Công cụ dọn RAM VPS nhẹ, viết bằng Rust"
+
+# Build tối ưu kích thước + tốc độ cho file release nhỏ nhất có thể
+[profile.release]
+opt-level = "z"     # tối ưu size
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[dependencies]
+# GUI cực nhẹ, native, không cần runtime ngoài (khác Electron/WPF)
+eframe = { version = "0.28", default-features = false, features = ["default_fonts", "glow", "persistence"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = [
+    "Win32_Foundation",
+    "Win32_System_SystemInformation",
+    "Win32_System_Performance",
+] }
+
+# Đọc RAM/CPU đa nền tảng, nhẹ, không cần WMI
+sysinfo = { version = "0.32", default-features = false, features = ["system"] }
+
+# Nhúng icon + version info (tên phần mềm, tác giả...) vào file .exe khi build trên Windows
+[target.'cfg(windows)'.build-dependencies]
+winres = "0.1"
+
+[[bin]]
+name = "CleanRamVPS"
+path = "src/main.rs"
