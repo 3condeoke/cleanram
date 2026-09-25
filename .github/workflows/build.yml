@@ -1,14 +1,16 @@
 name: Build CleanRamVPS
 
-# Chạy khi push code lên nhánh main, hoặc bấm nút "Run workflow" thủ công
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch: {}
+    tags:
+      - 'v*' # Tự chạy khi đẩy tag mới (vd: v1.0.0)
+  workflow_dispatch: {} # Nút bấm chạy thủ công
 
 jobs:
   build-windows:
     runs-on: windows-latest
+    permissions:
+      contents: write # Cấp quyền tạo Release cho GitHub Actions
 
     steps:
       - name: Checkout code
@@ -29,9 +31,13 @@ jobs:
       - name: Build release
         run: cargo build --release
 
-      - name: Upload file .exe
-        uses: actions/upload-artifact@v4
+      - name: Create GitHub Release & Upload EXE
+        uses: softprops/action-gh-release@v2
         with:
-          name: CleanRamVPS-windows
-          path: target/release/CleanRamVPS.exe
-          if-no-files-found: error
+          files: target/release/CleanRamVPS.exe
+          tag_name: ${{ github.ref_name }}
+          name: CleanRamVPS ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
